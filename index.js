@@ -172,74 +172,17 @@ app.post('/submitPost', async (req, res) => {
     //retrieve name, title, content, and tag from form
     const creatorName = currentUserName;//GET FROM DB HELP
     const creatorID = currentUserId;//GET FROM DB HELP
-    const blogTitle = req.body.blogTitle;
+    const recipeTitle = req.body.recipeTitle;
     const content = req.body.content;
     const tagName = req.body.tagName.toLowerCase();
 
     //add post to DB [NEW]
     const result = await db.query(
       "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag ) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5);",
-      [creatorName, creatorID, blogTitle, content, tagName]
+      [creatorName, creatorID, recipeTitle, content, tagName]
     );
     
     //redirect to home page
-    return res.redirect('/');
-});
-
-//go to the edit page with a particular post
-app.get("/edit/:id", async (req, res) => {
-    var post = {};
-    //find the original post by id [NEW]
-    const result = await db.query("SELECT * FROM blogs WHERE blog_id = $1", [
-      req.params.id,
-    ]);
-    //check if post found
-    if (result.rows.length > 0) {
-      //get the row
-      const gotPost = result.rows[0];
-      //check that the current user is the poster
-      if (gotPost.creator_user_id !== currentUserId){
-        //if not, redirect home
-        return res.redirect('/');
-      }
-      //if so, set variables for rendering edit page with filled in form
-      post = {name: gotPost.creator_name, title: gotPost.title, content: gotPost.body, time: gotPost.time_updated, initTime: gotPost.date_created, id: gotPost.blog_id, tag: gotPost.tag};
-    } else{
-      return res.redirect('/');
-    }
-  //remder the edits page using the post found to pre-fill in the inputs
-  return res.render("edit.ejs", { blogPost: post, tags:tags });
-});
-
-//submit edits to a post, then go redirect to home
-app.post('/edit-form/:id', async (req, res) => {
-    var post;
-    //find the original post by id [NEW]
-    const result = await db.query("SELECT * FROM blogs WHERE blog_id = $1", [
-      req.params.id,
-    ]);
-    //get post
-    post = result.rows[0];
-
-    //update it post
-    if(post)
-    {
-        //get updated title content and tag from submission
-        var id = req.params.id;
-        var title = req.body.blogTitle;
-        var content = req.body.content;
-        const tagName = req.body.tagName?.toLowerCase() || 'all';
-
-        //add post to DB
-        await db.query(
-          "UPDATE blogs \
-          SET title = $1, body = $2, time_updated = NOW(), tag = $3 \
-          WHERE blog_id = $4;",
-          [title, content, tagName, id]
-        );
-    }
-
-    //redirect home
     return res.redirect('/');
 });
 
