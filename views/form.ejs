@@ -14,15 +14,6 @@
         <label for="recipeTitle">Recipe Title:</label><br>
         <input type="text" id="recipeTitle" name="recipeTitle" required><br><br>
 
-        <!-- get tag w dropdown -->
-        <label for="tagName">Dietary Tags:</label><br>
-        <select name="tagName" id="tagName">
-            <% tags.forEach(function(tag) { %>
-                <option value="<%= tag %>"><%= tag %></option>
-            <% }) %>
-        </select>
-        <br><br>
-
         <!-- get ingredients -->
         <label for="ingredients">Ingredients:</label><br>
         <textarea id="ingredients" name="ingredients" rows="5" cols="50"></textarea>
@@ -32,9 +23,6 @@
         <label for="content">Instructions:</label><br>
         <textarea id="content" name="content" rows="5" cols="50"></textarea>
         <br><br>
-
-        <!-- submit -->
-        <input class="formSubmit" type="submit" value="Submit">
         
         <!-- get difficulty -->
         <label for="difficulty">Difficulty (1–5):</label><br>
@@ -46,6 +34,35 @@
         </select>
         <br><br>
         
+        <!-- get tag w dropdown -->
+        <label for="tagName">Dietary Tags:</label><br>
+        <select name="tagName" id="tagName">
+            <% tags.forEach(function(tag) { %>
+                <option value="<%= tag %>"><%= tag %></option>
+            <% }) %>
+        </select>
+        <br><br>
+
+        <% if (cuisineTypeTags && cuisineTypeTags.length > 0) { %>
+            <!-- get tag w dropdown -->
+            <label for="cuisineTag">Cuisine Tags:</label><br>
+            <select name="cuisineTag" id="cuisineTag">
+                <% cuisineTypeTags.forEach(function(cuisineTypeTag) { %>
+                    <option value="<%= cuisineTypeTag %>"><%= cuisineTypeTag %></option>
+                <% }) %>
+            </select>
+            <br><br>
+        <% } %>
+        
+        <!-- get tag w dropdown -->
+        <label for="mealType">Meal Types:</label><br>
+        <select name="mealType" id="mealType">
+            <% mealTypeTags.forEach(function(mealTypeTag) { %>
+                <option value="<%= mealTypeTag %>"><%= mealTypeTag %></option>
+            <% }) %>
+        </select>
+        <br><br>
+
         <!-- get photos -->
         <label for="image">Upload Image:</label><br>
         <input type="file" id="image" name="image" accept="image/*">
@@ -54,7 +71,7 @@
         <!-- get cook time -->
         <label for="cookTime">Cook Time (minutes):</label><br>
         <input type="number" id="cookTime" name="cookTime" min="0" step="1"><br><br>
-
+        <!-- submit -->
         <input class="formSubmit" type="submit" value="Submit">
 
     </form>

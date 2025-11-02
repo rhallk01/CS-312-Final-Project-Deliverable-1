@@ -55,8 +55,9 @@ const upload = multer({ storage: storage });
 
 
 //set up tags variables to be used later
-var tags = ["all" ,"tech", "lifestyle", "local", "diy", "art", "gardening", "sports"];
-
+var tags = ["gluten free" ,"nut free", "vegetarian"];
+var cuisineTypeTags = ["Indian" ,"Chinese", "Mediterranian"];
+var mealTypeTags = ["breakfast" ,"lunch", "dinner"];
 //set up variables to track the current user [NEW]
 let currentUserId;
 let currentUserName; 
@@ -64,7 +65,7 @@ let currentUserName;
 //function to get posts [NEW]
 async function getPosts() {
   const result = await db.query("SELECT * FROM blogs");
-  
+
   const posts = result.rows.map((post) => ({
     name: post.creator_name,
     title: post.title,
@@ -74,21 +75,21 @@ async function getPosts() {
     id: post.blog_id,
     tag: post.tag,
     creator_id: post.creator_user_id,
-    prep_time: post.prep_time,
+    cook_time: post.cook_time,
     ingredients: post.ingredients,
     difficulty: post.difficulty,
-    image_path: post.image_path
-
-
+    image_path: post.image_path,
+    mealType: post.mealType,
+    cuisineTag: post.cuisineTag
   }));
   return posts;
 }
 
 //standard home page render, send blog post, tags list, and current page
 app.get("/", async (req, res) => {
-  var blogPosts = await getPosts();
+  var allPosts = await getPosts();
   //const currentUser = await getCurrentUser();
-  res.render("index.ejs", {blogPosts: blogPosts, tags:tags, currentPage: 'index'});
+  res.render("index.ejs", {allPosts: allPosts, tags:tags, mealTypeTags:mealTypeTags, cuisineTypeTags:cuisineTypeTags, currentPage: 'index'});
 });
 
 //render login page [NEW]
@@ -178,7 +179,7 @@ app.get("/form", (req, res) => {
   if (!currentUserId){
     return res.redirect('/');
   }
-  res.render("form.ejs", {tags:tags});
+  res.render("form.ejs", {tags:tags, cuisineTypeTags:cuisineTypeTags, mealTypeTags:mealTypeTags});
 });
 
 //if the home button is clicked, redirect to home page render
@@ -187,8 +188,8 @@ app.get("/clickHome", (req, res) => {
 });
 
 //submit a blog post, then go back to home page
-app.post('/submitPost', async (req, res) => {
-    //make sure they are a user! [NEW]
+app.post('/submitPost', upload.single('image'), async (req, res) => {
+    //make sure they are a user! 
     if (!currentUserId){
       return res.redirect('/');
     }
@@ -203,11 +204,13 @@ app.post('/submitPost', async (req, res) => {
     const difficulty = parseInt(req.body.difficulty);
     const imagePath = req.file ? '/uploads/' + req.file.filename : null;
     const cookTime = parseInt(req.body.cookTime) || 0;
+    const cuisineTag = req.body.tagName.toLowerCase();
+    const mealType = req.body.tagName.toLowerCase();
 
-    //add post to DB [NEW]
-    const result = await db.query(
-      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty, instructions, image_path, cook_time) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7, $8, $9);",
-      [creatorName, creatorID, recipeTitle, content, tagName, difficulty, instructions, imagePath, cookTime]
+    //add post to DB 
+    await db.query(
+      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty, instructions, image_path, cook_time, cuisineTag, mealType) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7, $8, $9, $10, $11);",
+      [creatorName, creatorID, recipeTitle, content, tagName, difficulty, instructions, imagePath, cookTime, cuisineTag, mealType]
     );
     
     //redirect to home page
@@ -222,10 +225,10 @@ app.post("/tagSort", (req, res) => {
   const pickedTag = req.body.tag.toLowerCase();
   var taggedPosts = [];
   if (pickedTag == "all"){
-      taggedPosts = blogPosts;
+      taggedPosts = allPosts;
   //else, show only those with the tag using filter
   }else{
-      taggedPosts = blogPosts.filter(p => p.tag == pickedTag);
+      taggedPosts = allPosts.filter(p => p.tag == pickedTag);
   }
   
   //render home page with filtered posts 'taggedPosts' as tags
