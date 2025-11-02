@@ -23,19 +23,38 @@
     <!-- if on the home page, put the tags dropdown in the banner -->
     <!-- the if statement checks whether a variable called currentPage was passed-->
     <% if (locals.currentPage) { %>
-        <form action="/tagSort" method="POST">
-            <div class="dropdown">
-            <!-- dropdown label -->
-            <label for="tag">Sort by Tag:</label>
-            <!-- dropdown -->
+        <form action="/tagSort" method="POST" class="filterForm">
+        <div class="dropdown">
+            <label for="tag">Dietary Tag:</label>
             <select name="tag" id="tag">
-                <% tags.forEach(function(tag) { %>
+            <option value="all">All</option>
+            <% tags.forEach(function(tag) { %>
                 <option value="<%= tag %>"><%= tag %></option>
-                <% }) %>
+            <% }) %>
             </select>
-            <!-- submit the dropdown to make it so that only the posts w those tags show -->
-            <input class="selectorSubmit" type="submit" value="Go!">
-            </div>
+        </div>
+
+        <div class="dropdown">
+            <label for="cuisineTag">Cuisine:</label>
+            <select name="cuisineTag" id="cuisineTag">
+            <option value="all">All</option>
+            <% cuisineTypeTags.forEach(function(cuisineTag) { %>
+                <option value="<%= cuisineTag %>"><%= cuisineTag %></option>
+            <% }) %>
+            </select>
+        </div>
+
+        <div class="dropdown">
+            <label for="mealType">Meal Type:</label>
+            <select name="mealType" id="mealType">
+            <option value="all">All</option>
+            <% mealTypeTags.forEach(function(mealTag) { %>
+                <option value="<%= mealTag %>"><%= mealTag %></option>
+            <% }) %>
+            </select>
+        </div>
+
+        <input class="selectorSubmit" type="submit" value="Filter">
         </form>
     <% } %>
 

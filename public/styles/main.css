@@ -1,8 +1,8 @@
 body {
-  background: #A8BBA3;
+  background: #9CA986;
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
-  color: #715A5A;
+  color: #5F6F65;
 }
 
 main {
@@ -26,7 +26,7 @@ input, textarea {
   -webkit-appearance: none;
   border: 0;
   font-size: 0.9rem;
-  background: #715A5A;
+  background: #5F6F65;
   padding: .5rem;
   color: white;
   cursor: pointer;
@@ -47,7 +47,7 @@ input[type="submit"].formSubmit {
 .selectorSubmit{
   font-size: .7em;
   padding: .3em;
-  background-color: #A8BBA3;
+  background-color: #9CA986;
   box-shadow: none;
 }
 
@@ -64,7 +64,7 @@ label{
   margin-bottom: .6rem;
   margin-left: 20%;
   margin-right: 20%;
-  border: #715A5A;
+  border: #5F6F65;
   border-style: solid;
   border-radius: 10%;
   padding: 3%;
@@ -79,7 +79,7 @@ label{
   margin: 2rem 10% 2rem 10%;
   padding: 2rem;
   padding-bottom: 1rem;
-  border: 2px solid #715A5A;
+  border: 2px solid #5F6F65;
   background-color: #e4dcc1;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -90,7 +90,7 @@ label{
 .postBox p {
   margin: 0; 
   line-height: .8rem; 
-  color: #715A5A; 
+  color: #5F6F65; 
   font-size: 1rem;   
 }
 
@@ -99,7 +99,7 @@ label{
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #715A5A;
+  background-color: #5F6F65;
   color: #e4dcc1;
   padding: 1rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -108,7 +108,7 @@ label{
 }
 
 a:link, a:visited {
-  background-color: #A8BBA3;;
+  background-color: #9CA986;;
   color: white;
   padding: 10px 20px;
   text-align: center;
@@ -117,7 +117,7 @@ a:link, a:visited {
 }
 
 a:hover, a:active {
-  background-color: #A8BBA3;;
+  background-color: #9CA986;;
 }
 
 .blogPostDiv{
@@ -170,7 +170,7 @@ a:hover, a:active {
   text-align: center;
   font-size: 0.9rem;
   padding: 0.4rem 0.8rem;
-  background-color: #715A5A;
+  background-color: #5F6F65;
   color: white;
   text-decoration: none;
   border-radius: 5px;
@@ -182,15 +182,15 @@ a:hover, a:active {
 
 hr {
   border-style: solid;
-  border-color: #715A5A;
-  background-color: #715A5A;
+  border-color: #5F6F65;
+  background-color: #5F6F65;
   border-width: .2rem;
   width: 70%;
 }
 
 #deletebtn{
   margin-top: .5rem;
-  background-color: #A8BBA3;;
+  background-color: #9CA986;
   color: white;
   text-align: center;
   text-decoration: none;
@@ -230,7 +230,7 @@ hr {
 
 .ingredientsBlock h4, .instructionsBlock h4 {
   font-size: 1.1rem;
-  color: #715A5A;
+  color: #5F6F65;
   margin-bottom: 0.3rem;
   text-decoration: underline;
 }
@@ -257,4 +257,16 @@ hr {
   margin-top: 0.5rem;
   font-size: 0.95rem;
   color: #444;
+}
+
+.filterForm {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filterForm label {
+  font-weight: bold;
+  margin-right: 0.3rem;
 }

@@ -12,7 +12,7 @@ const app = express();
 const port = 3000;
 app.engine("ejs", ejs.__express);
 
-//connect to database [NEW]
+//connect to database  
 const db = new pg.Client({
   user: "postgres",
   host: "localhost",
@@ -55,14 +55,14 @@ const upload = multer({ storage: storage });
 
 
 //set up tags variables to be used later
-var tags = ["gluten free" ,"nut free", "vegetarian"];
-var cuisineTypeTags = ["Indian" ,"Chinese", "Mediterranian"];
-var mealTypeTags = ["breakfast" ,"lunch", "dinner"];
-//set up variables to track the current user [NEW]
+var tags = ["all", "gluten free" ,"nut free", "vegetarian", "keto", "vegan"];
+var cuisineTypeTags = ["all", "Indian" ,"Chinese", "Mediterranian", "UK", "USA", "Mexican"];
+var mealTypeTags = ["all", "breakfast" ,"lunch", "dinner", "snack"];
+//set up variables to track the current user  
 let currentUserId;
 let currentUserName; 
 
-//function to get posts [NEW]
+//function to get posts  
 async function getPosts() {
   const result = await db.query("SELECT * FROM blogs");
 
@@ -92,17 +92,17 @@ app.get("/", async (req, res) => {
   res.render("index.ejs", {allPosts: allPosts, tags:tags, mealTypeTags:mealTypeTags, cuisineTypeTags:cuisineTypeTags, currentPage: 'index'});
 });
 
-//render login page [NEW]
+//render login page  
 app.get("/login", (req, res) => {
   res.render("login.ejs", { error: '' });
 });
 
-//render registration page [NEW]
+//render registration page  
 app.get("/register", (req, res) => {
   res.render("register.ejs", { error: '' });
 });
 
-//handle submitted register request [NEW]
+//handle submitted register request  
 app.post("/register", async (req, res) => {
   //get the username, userid, and password that was entered
   const userName = req.body.username;
@@ -135,7 +135,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-//handle submitted login request [NEW]
+//handle submitted login request  
 app.post("/login", async (req, res) => {
   //get the userid and password that was entered
   const userId = req.body.user_id;
@@ -175,7 +175,7 @@ app.post("/login", async (req, res) => {
 
 //render make blog post page
 app.get("/form", (req, res) => {
-  //make sure they are a user! [NEW]
+  //make sure they are a user!  
   if (!currentUserId){
     return res.redirect('/');
   }
@@ -218,29 +218,37 @@ app.post('/submitPost', upload.single('image'), async (req, res) => {
     return res.redirect('/');
 });
 
-//if the user chooses a tag from the dropdown to sort by and clicks the
-//go! submit button, show only correctly tagged posts on home page
-app.post("/tagSort", (req, res) => {
-  //get tag from request, if all show all blog posts
-  
-  const pickedTag = req.body.tag.toLowerCase();
-  var taggedPosts = [];
-  if (pickedTag == "all"){
-      taggedPosts = allPosts;
-  //else, show only those with the tag using filter
-  }else{
-      taggedPosts = allPosts.filter(p => p.tag == pickedTag);
-  }
-  
+//if the user chooses tags from the dropdowns to sort by and clicks the
+//filter button, show only correctly tagged posts on home page
+app.post("/tagSort", async (req, res) => {
+  //get tags from request, if all show all blog posts
+  const { tag, cuisineTag, mealType } = req.body;
+  const allPosts = await getPosts();
+
+  // filter by tags
+  let filtered = allPosts.filter(p => {
+    const matchesTag = tag === "all" || p.tag?.toLowerCase() === tag.toLowerCase();
+    const matchesCuisine = cuisineTag === "all" || p.cuisineTag?.toLowerCase() === cuisineTag.toLowerCase();
+    const matchesMeal = mealType === "all" || p.mealType?.toLowerCase() === mealType.toLowerCase();
+    return matchesTag && matchesCuisine && matchesMeal;
+  });
+
   //render home page with filtered posts 'taggedPosts' as tags
-  return res.redirect("/");
+  res.render("index.ejs", {
+    allPosts: filtered,
+    tags,
+    cuisineTypeTags,
+    mealTypeTags,
+    currentPage: "index"
+  });
 });
+
 
 //if the delete button on a post is clicked, delete it and redirect home
 app.delete('/delete', async (req, res) => {
     //get id number of post to delete 
     const idNum = parseInt(req.body.id);
-    //delete post from DB [NEW]
+    //delete post from DB  
     await db.query(
       "DELETE FROM blogs \
       WHERE blog_id = $1;",
