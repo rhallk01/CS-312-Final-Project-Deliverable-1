@@ -74,6 +74,12 @@ async function getPosts() {
     id: post.blog_id,
     tag: post.tag,
     creator_id: post.creator_user_id,
+    prep_time: post.prep_time,
+    ingredients: post.ingredients,
+    difficulty: post.difficulty,
+    image_path: post.image_path
+
+
   }));
   return posts;
 }
@@ -196,11 +202,12 @@ app.post('/submitPost', async (req, res) => {
     const tagName = req.body.tagName.toLowerCase();
     const difficulty = parseInt(req.body.difficulty);
     const imagePath = req.file ? '/uploads/' + req.file.filename : null;
+    const cookTime = parseInt(req.body.cookTime) || 0;
 
     //add post to DB [NEW]
     const result = await db.query(
-      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty, instructions, image_path) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7, $8);",
-      [creatorName, creatorID, recipeTitle, content, tagName, difficulty, instructions, imagePath]
+      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty, instructions, image_path, cook_time) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7, $8, $9);",
+      [creatorName, creatorID, recipeTitle, content, tagName, difficulty, instructions, imagePath, cookTime]
     );
     
     //redirect to home page

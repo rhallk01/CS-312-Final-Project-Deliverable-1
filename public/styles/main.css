@@ -212,3 +212,8 @@ hr {
   border-radius: 10px;
   margin: 10px 0;
 }
+
+.post p {
+  margin: 4px 0;
+  color: #444;
+}

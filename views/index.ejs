@@ -30,9 +30,10 @@
             <p class="content"><%= blogPosts[i].content %></p>
             <p class="ingredients"><%= blogPosts[i].ingredients %></p>
             <h5 class="tag"><%= blogPosts[i].tag%></h5>
+            <p>Cook Time: <%= blogPosts[i].cook_time %> min</p><br>
             <p>Difficulty: <%= blogPosts[i].difficulty %> / 5</p>
-            <% if (post.image_path) { %>
-                <img src="<%= post.image_path %>" alt="Post image" class="postImage">
+            <% if (blogPosts.image_path) { %>
+                <img src="<%= blogPosts[i].image_path %>" alt="Post image" class="postImage">
             <% } %>
         </div>
     <%}}%>
