@@ -11,11 +11,11 @@
         <input type="text" id="creatorName" name="creatorName" required><br><br>-->
 
         <!-- get title -->
-        <label for="recipeTitle">Blog Title:</label><br>
+        <label for="recipeTitle">Recipe Title:</label><br>
         <input type="text" id="recipeTitle" name="recipeTitle" required><br><br>
 
         <!-- get tag w dropdown -->
-        <label for="tagName">Tag (optional):</label><br>
+        <label for="tagName">Dietary Tags:</label><br>
         <select name="tagName" id="tagName">
             <% tags.forEach(function(tag) { %>
                 <option value="<%= tag %>"><%= tag %></option>
@@ -35,7 +35,16 @@
 
         <!-- submit -->
         <input class="formSubmit" type="submit" value="Submit">
-
+        
+        <!-- get difficulty -->
+        <label for="difficulty">Difficulty (1–5):</label><br>
+        <select name="difficulty" id="difficulty" required>
+        <option value="" disabled selected>Select difficulty</option>
+        <% for (let i = 1; i <= 5; i++) { %>
+            <option value="<%= i %>"><%= i %></option>
+        <% } %>
+        </select>
+        <br><br>
     </form>
     </div>
 </body>

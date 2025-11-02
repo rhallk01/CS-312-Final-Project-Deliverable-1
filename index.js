@@ -4,6 +4,8 @@ import bodyParser from "body-parser";
 import methodOverride from 'method-override';
 import pg from "pg";
 import ejs from "ejs";
+import multer from "multer";
+import path from "path";
 
 //set up express and the port
 const app = express();
@@ -36,6 +38,21 @@ app.use(methodOverride(function (req, res) {
       return method
     }
   }))
+
+
+// Configure file upload storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/uploads/");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + path.extname(file.originalname);
+    cb(null, file.fieldname + "-" + uniqueSuffix);
+  },
+});
+
+const upload = multer({ storage: storage });
+
 
 //set up tags variables to be used later
 var tags = ["all" ,"tech", "lifestyle", "local", "diy", "art", "gardening", "sports"];
@@ -175,11 +192,12 @@ app.post('/submitPost', async (req, res) => {
     const recipeTitle = req.body.recipeTitle;
     const content = req.body.content;
     const tagName = req.body.tagName.toLowerCase();
+    const difficulty = parseInt(req.body.difficulty);
 
     //add post to DB [NEW]
     const result = await db.query(
-      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag ) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5);",
-      [creatorName, creatorID, recipeTitle, content, tagName]
+      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6);",
+      [creatorName, creatorID, recipeTitle, content, tagName, difficulty]
     );
     
     //redirect to home page
