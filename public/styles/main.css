@@ -217,3 +217,44 @@ hr {
   margin: 4px 0;
   color: #444;
 }
+
+.date {
+  font-size: 0.9rem;
+  color: #5a4a4a;
+}
+
+.ingredientsBlock, .instructionsBlock {
+  text-align: left;
+  margin-top: 1rem;
+}
+
+.ingredientsBlock h4, .instructionsBlock h4 {
+  font-size: 1.1rem;
+  color: #715A5A;
+  margin-bottom: 0.3rem;
+  text-decoration: underline;
+}
+
+.ingredientsBlock ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  color: #4a4a4a;
+  font-size: 0.95rem;
+}
+
+.metaInfo {
+  margin-top: 1rem;
+}
+
+.metaInfo .tag {
+  margin-right: 0.4rem;
+}
+
+.statsRow {
+  display: flex;
+  justify-content: flex-start;
+  gap: 2rem;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #444;
+}

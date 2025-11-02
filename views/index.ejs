@@ -4,57 +4,84 @@
 <body>   
 <!-- Blog Posts -->
 <h1 class="makeAPost">Blog Posts</h1>
-<div class="blogPostDiv">
-    <%if (locals.allPosts.length == 0 ){%>
-        <h2>Be the first to post!</h2>
-    <%}%>
-    <!-- loop through the array of allPosts -->
-    <%if (locals.allPosts) { for (let i = 0; i < allPosts.length; i++) {%>
-        <!-- postbox is the cute container for the post data -->
-        <div class="postBox">
+    <div class="blogPostDiv">
+
+        <% if (locals.allPosts.length === 0) { %>
+            <h2>Be the first to post!</h2>
+        <% } %>
+
+        <% if (locals.allPosts) { for (let i = 0; i < allPosts.length; i++) { %>
+            <div class="postBox">
+            <!-- Top Row: Date + Delete -->
             <div class="topRow">
-                <!-- put formatted date at the top left -->
                 <% 
-                const d = new Date(allPosts[i].time);
-                const formatted = d.toLocaleString('en-US', { 
-                    weekday: 'short', month: 'short', day: '2-digit', year: 'numeric', 
-                    hour: '2-digit', minute: '2-digit', hour12: false
-                }).replace(',', '');
-                %>
-                <p>Date: <%= formatted %></p>
-                <!-- put the delete button at the top right -->
-                <div class="buttonGroup">
-                    <form action="/delete" method="POST">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <input type="hidden" name="id" value="<%= allPosts[i].id  %>">
-                        <button type="submit" id= "deletebtn" >Delete</button>
-                    </form>
-                </div>
+                    const d = new Date(allPosts[i].time);
+                    const formatted = d.toLocaleString('en-US', { 
+                        weekday: 'short', month: 'short', day: '2-digit', year: 'numeric', 
+                        hour: '2-digit', minute: '2-digit', hour12: false 
+                        }).replace(',', '');
+            %>
+            <p class="date"><%= formatted %></p>
+
+            <div class="buttonGroup">
+                <form action="/delete" method="POST">
+                <input type="hidden" name="_method" value="DELETE">
+                <input type="hidden" name="id" value="<%= allPosts[i].id %>">
+                <button type="submit" id="deletebtn">Delete</button>
+                </form>
             </div>
-            <!-- put the creator name, post title, content, and tag in the post -->
-            <p class="name">Creator: <strong><%= allPosts[i].name %></strong></p><br>
+            </div>
+
+            <!-- Creator and Title -->
+            <p class="name"><strong><%= allPosts[i].name %></strong></p>
             <h3 class="title"><%= allPosts[i].title %></h3>
-            <p class="ingredients"><%= allPosts[i].ingredients %></p>
-            <p class="content"><%= allPosts[i].content %></p>
-            <h5 class="tag"><%= allPosts[i].tag%></h5>
 
+            <!-- Image -->
+            <% if (allPosts[i].image_path) { %>
+            <img src="<%= allPosts[i].image_path %>" alt="Post image" class="postImage">
+            <% } %>
+
+            <!-- Ingredients -->
+            <% if (allPosts[i].ingredients && allPosts[i].ingredients.trim() !== "") { %>
+            <div class="ingredientsBlock">
+                <h4>Ingredients</h4>
+                <ul>
+                <% allPosts[i].ingredients.split('\n').forEach(function(line) { %>
+                    <li><%= line.trim() %></li>
+                <% }); %>
+                </ul>
+            </div>
+            <% } %>
+
+            <!-- Instructions / Content -->
+            <% if (allPosts[i].content) { %>
+            <div class="instructionsBlock">
+                <h4>Instructions</h4>
+                <p><%= allPosts[i].content %></p>
+            </div>
+            <% } %>
+
+            <!-- Tags and Extra Info -->
+            <div class="metaInfo">
+            <% if (allPosts[i].tag) { %>
+                <span class="tag"><%= allPosts[i].tag %></span>
+            <% } %>
             <% if (allPosts[i].cuisineTag) { %>
-                <h5 class="cuisineTag"><%= allPosts[i].cuisineTag%></h5>
+                <span class="tag"><%= allPosts[i].cuisineTag %></span>
             <% } %>
-
             <% if (allPosts[i].mealType) { %>
-            <h5 class="mealType"><%= allPosts[i].mealType%></h5>
+                <span class="tag"><%= allPosts[i].mealType %></span>
             <% } %>
+            </div>
 
-            <p>Cook Time: <%= allPosts[i].cook_time %> min</p><br>
+            <!-- Stats -->
+            <div class="statsRow">
+            <p>Cook Time: <%= allPosts[i].cook_time %> min</p>
             <p>Difficulty: <%= allPosts[i].difficulty %> / 5</p>
-            <% if (allPosts.image_path) { %>
-                <img src="<%= allPosts[i].image_path %>" alt="Post image" class="postImage">
-            <% } %>
+            </div>
         </div>
-    <%}}%>
-</div>
-
+        <% } } %>
+    </div>
 </body>
 </main>
 </html>
