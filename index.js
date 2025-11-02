@@ -64,6 +64,7 @@ let currentUserName;
 //function to get posts [NEW]
 async function getPosts() {
   const result = await db.query("SELECT * FROM blogs");
+  
   const posts = result.rows.map((post) => ({
     name: post.creator_name,
     title: post.title,
@@ -187,17 +188,19 @@ app.post('/submitPost', async (req, res) => {
     }
   
     //retrieve name, title, content, and tag from form
-    const creatorName = currentUserName;//GET FROM DB HELP
-    const creatorID = currentUserId;//GET FROM DB HELP
+    const creatorName = currentUserName;
+    const creatorID = currentUserId;
     const recipeTitle = req.body.recipeTitle;
     const content = req.body.content;
+    const instructions = req.body.instructions;
     const tagName = req.body.tagName.toLowerCase();
     const difficulty = parseInt(req.body.difficulty);
+    const imagePath = req.file ? '/uploads/' + req.file.filename : null;
 
     //add post to DB [NEW]
     const result = await db.query(
-      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6);",
-      [creatorName, creatorID, recipeTitle, content, tagName, difficulty]
+      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty, instructions, image_path) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7, $8);",
+      [creatorName, creatorID, recipeTitle, content, tagName, difficulty, instructions, imagePath]
     );
     
     //redirect to home page

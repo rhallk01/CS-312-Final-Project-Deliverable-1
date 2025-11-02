@@ -5,7 +5,7 @@
     <h1 class="makeAPost">Build-a-Blog</h1>
     <!-- Blog post form -->
     <div class="formsDiv">
-    <form action="/submitPost" method="POST">
+    <form action="/submitPost" method="POST" enctype="multipart/form-data">
         <!-- get name 
         <label for="creatorName">Name:</label><br>
         <input type="text" id="creatorName" name="creatorName" required><br><br>-->
@@ -45,6 +45,14 @@
         <% } %>
         </select>
         <br><br>
+        
+        <!-- get photos -->
+        <label for="image">Upload Image:</label><br>
+        <input type="file" id="image" name="image" accept="image/*">
+        <br><br>
+
+        <input class="formSubmit" type="submit" value="Submit">
+
     </form>
     </div>
 </body>
