@@ -200,6 +200,7 @@ app.post('/submitPost', upload.single('image'), async (req, res) => {
     const recipeTitle = req.body.recipeTitle;
     const content = req.body.content;
     const instructions = req.body.instructions;
+    const ingredients = req.body.ingredients;
     const tagName = req.body.tagName.toLowerCase();
     const difficulty = parseInt(req.body.difficulty);
     const imagePath = req.file ? '/uploads/' + req.file.filename : null;
@@ -209,8 +210,8 @@ app.post('/submitPost', upload.single('image'), async (req, res) => {
 
     //add post to DB 
     await db.query(
-      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty, instructions, image_path, cook_time, cuisineTag, mealType) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7, $8, $9, $10, $11);",
-      [creatorName, creatorID, recipeTitle, content, tagName, difficulty, instructions, imagePath, cookTime, cuisineTag, mealType]
+      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty, instructions, image_path, cook_time, cuisineTag, mealType, ingredients) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7, $8, $9, $10, $11, $12);",
+      [creatorName, creatorID, recipeTitle, content, tagName, difficulty, instructions, imagePath, cookTime, cuisineTag, mealType, ingredients]
     );
     
     //redirect to home page
