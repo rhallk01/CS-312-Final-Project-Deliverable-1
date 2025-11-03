@@ -12,7 +12,7 @@
 
         <% if (locals.allPosts) { for (let i = 0; i < allPosts.length; i++) { %>
             <div class="postBox">
-            <!-- Top Row: Date + Delete -->
+            <!-- top row: date, save -->
             <div class="topRow">
                 <% 
                     const d = new Date(allPosts[i].time);
@@ -21,14 +21,15 @@
                         hour: '2-digit', minute: '2-digit', hour12: false 
                         }).replace(',', '');
             %>
-            <p class="date"><%= formatted %></p>
+            <p class="date"><%= formatted %></p><br>
 
             <div class="buttonGroup">
-                <form action="/delete" method="POST">
-                <input type="hidden" name="_method" value="DELETE">
-                <input type="hidden" name="id" value="<%= allPosts[i].id %>">
-                <button type="submit" id="deletebtn">Delete</button>
-                </form>
+                <% if (locals.currentUserId) { %>
+                    <form action="/saveRecipe" method="POST">
+                        <input type="hidden" name="recipeId" value="<%= allPosts[i].id %>">
+                        <button type="submit" id="deletebtn">Save Recipe</button>
+                    </form>
+                <% } %>
             </div>
             </div>
 

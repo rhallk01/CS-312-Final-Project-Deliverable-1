@@ -22,7 +22,6 @@ const db = new pg.Client({
 });
 db.connect();
 
-
 //tell express what folder the static files are, make them accessible with relative urls
 app.use(express.static("public"));
 //parse data that is recieved
@@ -89,7 +88,7 @@ async function getPosts() {
 app.get("/", async (req, res) => {
   var allPosts = await getPosts();
   //const currentUser = await getCurrentUser();
-  res.render("index.ejs", {allPosts: allPosts, tags:tags, mealTypeTags:mealTypeTags, cuisineTypeTags:cuisineTypeTags, currentPage: 'index'});
+  res.render("index.ejs", {allPosts: allPosts, tags:tags, mealTypeTags:mealTypeTags, cuisineTypeTags:cuisineTypeTags, currentPage: 'index', currentUserId: currentUserId});
 });
 
 //render login page  
@@ -209,11 +208,20 @@ app.post('/submitPost', upload.single('image'), async (req, res) => {
     const mealType = req.body.mealType.toLowerCase();
 
     //add post to DB 
-    await db.query(
-      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty, instructions, image_path, cook_time, cuisinetag, mealtype, ingredients) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7, $8, $9, $10, $11, $12);",
+    const result = await db.query(
+      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty, instructions, image_path, cook_time, cuisinetag, mealtype, ingredients) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7, $8, $9, $10, $11, $12) RETURNING blog_id;",
       [creatorName, creatorID, recipeTitle, content, tagName, difficulty, instructions, imagePath, cookTime, cuisineTag, mealType, ingredients]
     );
     
+    const newPostId = result.rows[0].blog_id;
+
+    // add recipe ID to user's submitted_recipes
+    await db.query(`
+      UPDATE users
+      SET submitted_recipes = array_append(submitted_recipes, $1)
+      WHERE user_id = $2;
+    `, [newPostId, currentUserId]);   
+      
     //redirect to home page
     return res.redirect('/');
 });
@@ -243,18 +251,84 @@ app.post("/tagSort", async (req, res) => {
   });
 });
 
+//save recipe to profile
+app.post("/saveRecipe", async (req, res) => {
+  //if not logged in, redirect to login
+  if (!currentUserId) return res.redirect("/login");
 
-//if the delete button on a post is clicked, delete it and redirect home
-app.delete('/delete', async (req, res) => {
-    //get id number of post to delete 
-    const idNum = parseInt(req.body.id);
-    //delete post from DB  
-    await db.query(
-      "DELETE FROM blogs \
-      WHERE blog_id = $1;",
-      [idNum]
-   );
-    return res.redirect('/');
+  //get id of recipe clicked on
+  const recipeId = parseInt(req.body.recipeId);
+  //find in db by id
+  try {
+    //update users table by user_id to add the recipe id
+    //to the saved_recipes column
+    await db.query(`
+      UPDATE users
+      SET saved_recipes = array_append(saved_recipes, $1)
+      WHERE user_id = $2;
+    `, [recipeId, currentUserId]);
+    //redirect home
+    res.redirect("/");
+  } catch (err) {
+    console.error("error saving recipe:", err);
+    res.status(500).send("Save failed");
+  }
+});
+
+//go to profile page
+app.get("/profile", async (req, res) => {
+  //if user not logged in, redirect to login page
+  if (!currentUserId) return res.redirect("/login");
+
+  try {
+    //find user in db, make sure they exist
+    const userResult = await db.query("SELECT * FROM users WHERE user_id = $1", [currentUserId]);
+    const user = userResult.rows[0];
+
+    // get the recipes that the user has in saved_recipes by searching the blogs database
+    //for any entries whose blog_id is in the users saved_recipes
+    const saved = user.saved_recipes.length
+      ? await db.query("SELECT * FROM blogs WHERE blog_id = ANY($1::int[])", [user.saved_recipes])
+      : { rows: [] };
+
+    // get the recipes that the user has in submitted_recipes by searching the blogs database
+    //for any entries whose blog_id is in the users submitted_recipes
+    const submitted = user.submitted_recipes.length
+      ? await db.query("SELECT * FROM blogs WHERE blog_id = ANY($1::int[])", [user.submitted_recipes])
+      : { rows: [] };
+
+    //get collections from user row
+    const collections = await db.query("SELECT * FROM collections WHERE user_id = $1", [currentUserId]);
+
+    //reder profile page with the above info
+    res.render("profile.ejs", {
+      user,
+      saved: saved.rows,
+      submitted: submitted.rows,
+      collections: collections.rows
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Profile failed to load");
+  }
+});
+
+//add collections tp profile
+app.post("/addCollection", async (req, res) => {
+  //if current user isnt logged in, redirect to login
+  if (!currentUserId) return res.redirect("/login");
+
+  //get new collection name 
+  const { name } = req.body;
+  try {
+    //insert a collection into the collection database, with the name of the collection and the user it belongs to 
+    await db.query("INSERT INTO collections (user_id, name) VALUES ($1, $2)", [currentUserId, name]);
+    //redirect to profile
+    res.redirect("/profile");
+  } catch (err) {
+    console.error("Error adding collection:", err);
+    res.status(500).send("Could not add collection");
+  }
 });
 
 //start the Express server
