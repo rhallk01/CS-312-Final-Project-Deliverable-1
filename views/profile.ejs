@@ -14,23 +14,47 @@
         
             <!-- dynamically show collections -->
             <section class="collection-section">
-            <h2>Collections</h2>
-            <% if (collections.length === 0) { %>
+            <div class="collection-wrapper">
+                <h2>Collections</h2>
+                
+                <% if (collections.length === 0) { %>
                 <p>No collections yet.</p>
-            <% } else { %>
+                <% } else { %>
                 <% collections.forEach(c => { %>
-                <div class="collection">
+                    <div class="collection">
                     <h4><%= c.name %></h4>
-                    <p>Contains <%= c.recipe_ids.length %> recipes</p>
-                </div>
+                    
+                    <% if (!c.recipe_ids || c.recipe_ids.length === 0) { %>
+                        <p>No recipes in this collection yet.</p>
+                    <% } else { %>
+                        <ul>
+                        <% 
+                            c.recipe_ids.forEach(id => {
+                            const recipe = [...saved, ...submitted].find(r => r.blog_id === id);
+                            if (recipe) { 
+                        %>
+                            <li><strong><%= recipe.title %></strong> by <%= recipe.creator_name %></li>
+                        <% 
+                            } else { 
+                        %>
+                            <li>Recipe ID <%= id %> (not found)</li>
+                        <% 
+                            } 
+                            });
+                        %>
+                        </ul>
+                    <% } %>
+                    </div>
                 <% }) %>
-            <% } %>
+                <% } %>
 
-            <!-- add collection with name -->
-            <form action="/addCollection" method="POST">
+                
+                <!-- add collection with name -->
+                <br><form action="/addCollection" method="POST" class="addCollectionForm">
                 <input type="text" name="name" placeholder="New Collection Name" required>
-                <button type="submit">Add</button>
-            </form>
+                <button type="submit" class="saveBtn">Add</button>
+                </form>
+            </div>
             </section>
 
             <!-- dynamically show saved recipes -->
@@ -100,6 +124,21 @@
                         <p>Cook Time: <%= recipe.cook_time %> min</p>
                         <p>Difficulty: <%= recipe.difficulty %> / 5</p>
                         </div>
+
+                        <!-- Add to Collection Dropdown -->
+                        <% if (collections.length > 0) { %>
+                        <form action="/addToCollection" method="POST" class="addToCollectionForm">
+                            <input type="hidden" name="recipe_id" value="<%= recipe.blog_id %>">
+                            <label for="collection">Add to collection:</label>
+                            <select name="collection_id" required>
+                            <% collections.forEach(collection => { %>
+                                <option value="<%= collection.id %>"><%= collection.name %></option>
+                            <% }); %>
+                            </select>
+                            <button type="submit" class="saveBtn">Add</button>
+                        </form>
+                        <% } %>
+
                     </div>
                     </div>
                 <% }) %>
@@ -174,6 +213,21 @@
                         <p>Cook Time: <%= recipe.cook_time %> min</p>
                         <p>Difficulty: <%= recipe.difficulty %> / 5</p>
                         </div>
+
+                        <!-- Add to Collection Dropdown -->
+                        <% if (collections.length > 0) { %>
+                        <form action="/addToCollection" method="POST" class="addToCollectionForm">
+                            <input type="hidden" name="recipe_id" value="<%= recipe.blog_id %>">
+                            <label for="collection">Add to collection:</label>
+                            <select name="collection_id" required>
+                            <% collections.forEach(collection => { %>
+                                <option value="<%= collection.id %>"><%= collection.name %></option>
+                            <% }); %>
+                            </select>
+                            <button type="submit" class="saveBtn">Add</button>
+                        </form>
+                        <% } %>
+                                    
                     </div>
                     </div>
                 <% }) %>

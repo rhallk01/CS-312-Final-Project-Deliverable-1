@@ -382,3 +382,9 @@ hr {
 .collection ul {
   margin-left: 1.5rem;
 }
+
+.addToCollectionForm {
+  margin-top: 0.3rem;
+  font-size: 0.9rem;
+  color: #4a4a4a;
+}

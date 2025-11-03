@@ -331,6 +331,41 @@ app.post("/addCollection", async (req, res) => {
   }
 });
 
+// add a saved or submitted recipe to a collection
+app.post("/addToCollection", async (req, res) => {
+  //if user not logged in, redirect to login page
+  if (!currentUserId) {
+    return res.redirect("/login");
+  }
+
+  const { recipe_id, collection_id } = req.body;
+  const recipeId = parseInt(recipe_id);
+  const collectionId = parseInt(collection_id);
+
+  try {
+    // get current recipe_ids in the selected collection
+    const result = await db.query("SELECT recipe_ids FROM collections WHERE id = $1 AND user_id = $2", [collectionId, currentUserId]);
+    if (result.rows.length === 0) {
+      return res.status(404).send("not found");
+    }
+
+    let recipeIds = result.rows[0].recipe_ids || [];
+
+    // avoid duplicates
+    if (!recipeIds.includes(recipeId)) {
+      recipeIds.push(recipeId);
+    }
+
+    // update collection
+    await db.query("UPDATE collections SET recipe_ids = $1 WHERE id = $2", [recipeIds, collectionId]);
+    res.redirect("/profile");
+  } catch (err) {
+    console.error("Error adding recipe to collection:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
 //start the Express server
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
