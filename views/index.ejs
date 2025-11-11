@@ -2,9 +2,9 @@
 <%- include("partials/header.ejs") %>
 
 <body>   
-<!-- Blog Posts -->
-<h1 class="makeAPost">Blog Posts</h1>
-    <div class="blogPostDiv">
+<!-- Recipe Posts -->
+<h1 class="makeAPost">Recipe Posts</h1>
+    <div class="RecipePostDiv">
 
         <% if (locals.allPosts.length === 0) { %>
             <h2>Be the first to post!</h2>
@@ -80,6 +80,14 @@
             <p>Cook Time: <%= allPosts[i].cook_time %> min</p>
             <p>Difficulty: <%= allPosts[i].difficulty %> / 5</p>
             </div>
+
+            <!-- Notes -->
+            <% if (allPosts[i].notes && allPosts[i].notes.trim() !== "") { %>
+            <div class="notes">
+                <h4>Notes</h4>
+                <p><%= allPosts[i].notes %></p>
+            </div>
+            <% } %>
         </div>
         <% } } %>
     </div>

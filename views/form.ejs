@@ -2,8 +2,8 @@
 <%- include("partials/header.ejs") %>
 
 <body>
-    <h1 class="makeAPost">Build-a-Blog</h1>
-    <!-- Blog post form -->
+    <h1 class="makeAPost">Build-a-Recipe</h1>
+    <!-- Recipe post form -->
     <div class="formsDiv">
     <form action="/submitPost" method="POST" enctype="multipart/form-data">
         <!-- get name 
@@ -71,9 +71,14 @@
         <!-- get cook time -->
         <label for="cookTime">Cook Time (minutes):</label><br>
         <input type="number" id="cookTime" name="cookTime" min="0" step="1"><br><br>
+
+        <!-- get Notes -->
+        <label for="notes">Notes (optional):</label><br>
+        <textarea id="notes" name="notes" rows="3" cols="50" placeholder="Any tips or extra details..."></textarea>
+        <br><br>
+
         <!-- submit -->
         <input class="formSubmit" type="submit" value="Submit">
-
     </form>
     </div>
 </body>

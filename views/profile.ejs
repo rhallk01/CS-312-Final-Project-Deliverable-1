@@ -1,10 +1,9 @@
 <!-- include the code from partials (banner with nav) -->
 <%- include("partials/header.ejs") %>
 </main>
-<body>
+<body class="profilePage">
     <div class="profile">
         <br><br><br>
-        <body class="profilePage">
         <div class="profileContainer">
             <h1><%= user.name %>’s Profile</h1>
 
@@ -30,7 +29,7 @@
                         <ul>
                         <% 
                             c.recipe_ids.forEach(id => {
-                            const recipe = [...saved, ...submitted].find(r => r.blog_id === id);
+                            const recipe = [...saved, ...submitted].find(r => r.recipe_id === id);
                             if (recipe) { 
                         %>
                             <li><strong><%= recipe.title %></strong> by <%= recipe.creator_name %></li>
@@ -67,10 +66,10 @@
             <% } else { %>
                 <div class="recipeList">
                 <% saved.forEach(recipe => { %>
-                    <div class="recipeBubble" data-recipe-id="<%= recipe.blog_id %>">
+                    <div class="recipeBubble" data-recipe-id="<%= recipe.recipe_id %>">
                     <span><%= recipe.title %></span>
                     </div>
-                    <div class="recipeDetails hidden" id="recipe-<%= recipe.blog_id %>">
+                    <div class="recipeDetails hidden" id="saved-<%= recipe.recipe_id %>">
                     <div class="postBox">
                         <div class="topRow">
                         <% 
@@ -125,10 +124,17 @@
                         <p>Difficulty: <%= recipe.difficulty %> / 5</p>
                         </div>
 
+                        <% if (recipe.notes) { %>
+                        <div class="notes">
+                            <h4>Notes</h4>
+                            <p><%= recipe.notes %></p>
+                        </div>
+                        <% } %>
+
                         <!-- Add to Collection Dropdown -->
                         <% if (collections.length > 0) { %>
                         <form action="/addToCollection" method="POST" class="addToCollectionForm">
-                            <input type="hidden" name="recipe_id" value="<%= recipe.blog_id %>">
+                            <input type="hidden" name="recipe_id" value="<%= recipe.recipe_id %>">
                             <label for="collection">Add to collection:</label>
                             <select name="collection_id" required>
                             <% collections.forEach(collection => { %>
@@ -156,10 +162,10 @@
             <% } else { %>
                 <div class="recipeList">
                 <% submitted.forEach(recipe => { %>
-                    <div class="recipeBubble" data-recipe-id="<%= recipe.blog_id %>">
+                    <div class="recipeBubble" data-recipe-id="<%= recipe.recipe_id %>">
                     <span><%= recipe.title %></span>
                     </div>
-                    <div class="recipeDetails hidden" id="recipe-<%= recipe.blog_id %>">
+                    <div class="recipeDetails hidden" id="submitted-<%= recipe.recipe_id %>">
                     <div class="postBox">
                         <div class="topRow">
                         <% 
@@ -214,10 +220,17 @@
                         <p>Difficulty: <%= recipe.difficulty %> / 5</p>
                         </div>
 
+                        <% if (recipe.notes) { %>
+                        <div class="notes">
+                            <h4>Notes</h4>
+                            <p><%= recipe.notes %></p>
+                        </div>
+                        <% } %>
+
                         <!-- Add to Collection Dropdown -->
                         <% if (collections.length > 0) { %>
                         <form action="/addToCollection" method="POST" class="addToCollectionForm">
-                            <input type="hidden" name="recipe_id" value="<%= recipe.blog_id %>">
+                            <input type="hidden" name="recipe_id" value="<%= recipe.recipe_id %>">
                             <label for="collection">Add to collection:</label>
                             <select name="collection_id" required>
                             <% collections.forEach(collection => { %>
@@ -238,9 +251,11 @@
             <script>
             document.querySelectorAll(".recipeBubble").forEach(bubble => {
                 bubble.addEventListener("click", () => {
-                const id = bubble.dataset.recipeId;
-                const details = document.getElementById("recipe-" + id);
-                details.classList.toggle("hidden");
+                    const parentSection = bubble.closest("section");
+                    const idPrefix = parentSection.classList.contains("saved-section") ? "saved-" : "submitted-";
+                    const id = idPrefix + bubble.dataset.recipeId;
+                    const details = document.getElementById(id);
+                    details.classList.toggle("hidden");
                 });
             });
             </script>

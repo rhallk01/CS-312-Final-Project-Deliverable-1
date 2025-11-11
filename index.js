@@ -16,8 +16,8 @@ app.engine("ejs", ejs.__express);
 const db = new pg.Client({
   user: "postgres",
   host: "localhost",
-  database: "BlogDB",
-  password: "darkgreyseaslug1234",
+  database: "RecipeDB",
+  password: "#Hammer25!",
   port: 5432,
 });
 db.connect();
@@ -63,7 +63,7 @@ let currentUserName;
 
 //function to get posts  
 async function getPosts() {
-  const result = await db.query("SELECT * FROM blogs");
+  const result = await db.query("SELECT * FROM recipes");
 
   const posts = result.rows.map((post) => ({
     name: post.creator_name,
@@ -71,7 +71,7 @@ async function getPosts() {
     content: post.body,
     time: post.time_updated,
     initTime: post.date_created,
-    id: post.blog_id,
+    id: post.recipe_id,
     tag: post.tag,
     creator_id: post.creator_user_id,
     cook_time: post.cook_time,
@@ -79,12 +79,13 @@ async function getPosts() {
     difficulty: post.difficulty,
     image_path: post.image_path,
     mealType: post.mealtype,
-    cuisineTag: post.cuisinetag
+    cuisineTag: post.cuisinetag,
+    notes: post.notes
   }));
   return posts;
 }
 
-//standard home page render, send blog post, tags list, and current page
+//standard home page render, send recipe post, tags list, and current page
 app.get("/", async (req, res) => {
   var allPosts = await getPosts();
   //const currentUser = await getCurrentUser();
@@ -172,7 +173,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-//render make blog post page
+//render make recipe post page
 app.get("/form", (req, res) => {
   //make sure they are a user!  
   if (!currentUserId){
@@ -186,7 +187,7 @@ app.get("/clickHome", (req, res) => {
   return res.redirect('/');
 });
 
-//submit a blog post, then go back to home page
+//submit a recipe post, then go back to home page
 app.post('/submitPost', upload.single('image'), async (req, res) => {
     //make sure they are a user! 
     if (!currentUserId){
@@ -206,14 +207,15 @@ app.post('/submitPost', upload.single('image'), async (req, res) => {
     const cookTime = parseInt(req.body.cookTime) || 0;
     const cuisineTag = req.body.cuisineTag.toLowerCase();
     const mealType = req.body.mealType.toLowerCase();
+    const notes = req.body.notes || null;
 
     //add post to DB 
     const result = await db.query(
-      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty, instructions, image_path, cook_time, cuisinetag, mealtype, ingredients) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7, $8, $9, $10, $11, $12) RETURNING blog_id;",
-      [creatorName, creatorID, recipeTitle, content, tagName, difficulty, instructions, imagePath, cookTime, cuisineTag, mealType, ingredients]
+      "INSERT INTO recipes (creator_name, creator_user_id, title, body, date_created, time_updated, tag, difficulty, instructions, image_path, cook_time, cuisinetag, mealtype, ingredients, notes) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING recipe_id;",
+      [creatorName, creatorID, recipeTitle, content, tagName, difficulty, instructions, imagePath, cookTime, cuisineTag, mealType, ingredients, notes]
     );
     
-    const newPostId = result.rows[0].blog_id;
+    const newPostId = result.rows[0].recipe_id;
 
     // add recipe ID to user's submitted_recipes
     await db.query(`
@@ -229,7 +231,7 @@ app.post('/submitPost', upload.single('image'), async (req, res) => {
 //if the user chooses tags from the dropdowns to sort by and clicks the
 //filter button, show only correctly tagged posts on home page
 app.post("/tagSort", async (req, res) => {
-  //get tags from request, if all show all blog posts
+  //get tags from request, if all show all recipe posts
   const { tag, cuisineTag, mealType } = req.body;
   const allPosts = await getPosts();
 
@@ -285,16 +287,16 @@ app.get("/profile", async (req, res) => {
     const userResult = await db.query("SELECT * FROM users WHERE user_id = $1", [currentUserId]);
     const user = userResult.rows[0];
 
-    // get the recipes that the user has in saved_recipes by searching the blogs database
-    //for any entries whose blog_id is in the users saved_recipes
+    // get the recipes that the user has in saved_recipes by searching the recipes database
+    //for any entries whose recipe_id is in the users saved_recipes
     const saved = user.saved_recipes.length
-      ? await db.query("SELECT * FROM blogs WHERE blog_id = ANY($1::int[])", [user.saved_recipes])
+      ? await db.query("SELECT * FROM recipes WHERE recipe_id = ANY($1::int[])", [user.saved_recipes])
       : { rows: [] };
 
-    // get the recipes that the user has in submitted_recipes by searching the blogs database
-    //for any entries whose blog_id is in the users submitted_recipes
+    // get the recipes that the user has in submitted_recipes by searching the recipes database
+    //for any entries whose recipe_id is in the users submitted_recipes
     const submitted = user.submitted_recipes.length
-      ? await db.query("SELECT * FROM blogs WHERE blog_id = ANY($1::int[])", [user.submitted_recipes])
+      ? await db.query("SELECT * FROM recipes WHERE recipe_id = ANY($1::int[])", [user.submitted_recipes])
       : { rows: [] };
 
     //get collections from user row

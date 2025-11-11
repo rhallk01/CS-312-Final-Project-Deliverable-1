@@ -166,11 +166,11 @@ a:hover, a:active {
   background-color: #9CA986;;
 }
 
-.blogPostDiv{
+.RecipePostDiv{
   width: 100%;
 }
 
-.blogPostDiv a{
+.RecipePostDiv a{
   margin-top: .5rem;
   font-size: .8rem;
 }
@@ -387,4 +387,23 @@ hr {
   margin-top: 0.3rem;
   font-size: 0.9rem;
   color: #4a4a4a;
+}
+
+.notes {
+  text-align: left;
+  margin-top: 1rem;
+}
+
+.notes h4 {
+  font-size: 1.1rem;
+  color: #5F6F65;
+  margin-bottom: 0.3rem;
+  text-decoration: underline;
+}
+
+.notes p {
+  margin-left: 0rem;
+  color: #4a4a4a;
+  font-size: 0.95rem;
+  line-height: 1.3rem;
 }
